@@ -13,23 +13,23 @@ type ResultsPageProps = {
 };
 
 export default function ResultsPage({ searchParams }: ResultsPageProps) {
-  const total = Number(searchParams.total || 0);
+  // 🔒 Explicit parsing (this is the fix)
+  const total = Number(searchParams.total ?? 0);
+  const home = Number(searchParams.home ?? 0);
+  const bills = Number(searchParams.bills ?? 0);
+  const food = Number(searchParams.food ?? 0);
+  const transport = Number(searchParams.transport ?? 0);
+  const kids = Number(searchParams.kids ?? 0);
+  const fun = Number(searchParams.fun ?? 0);
 
-  const categories = [
-    { key: "home", label: "🏠 Home" },
-    { key: "bills", label: "⚡ Bills" },
-    { key: "food", label: "🛒 Food" },
-    { key: "transport", label: "🚗 Transport" },
-    { key: "kids", label: "👶 Kids" },
-    { key: "fun", label: "🎉 Fun" },
-  ];
-
-  const breakdown = categories
-    .map((c) => ({
-      ...c,
-      value: Number(searchParams[c.key as keyof typeof searchParams] || 0),
-    }))
-    .filter((c) => c.value > 0);
+  const breakdown = [
+    { label: "🏠 Home", value: home },
+    { label: "⚡ Bills", value: bills },
+    { label: "🛒 Food", value: food },
+    { label: "🚗 Transport", value: transport },
+    { label: "👶 Kids", value: kids },
+    { label: "🎉 Fun", value: fun },
+  ].filter((item) => item.value > 0);
 
   const biggest = breakdown.sort((a, b) => b.value - a.value)[0];
 
@@ -53,7 +53,7 @@ export default function ResultsPage({ searchParams }: ResultsPageProps) {
 
           {breakdown.map((item) => (
             <div
-              key={item.key}
+              key={item.label}
               className="flex justify-between py-2 border-b last:border-b-0"
             >
               <span>{item.label}</span>
@@ -84,10 +84,7 @@ export default function ResultsPage({ searchParams }: ResultsPageProps) {
   );
 }
 
-function generateInsight(biggest: {
-  label: string;
-  value: number;
-}) {
+function generateInsight(biggest: { label: string; value: number }) {
   if (biggest.label.includes("Food")) {
     return `Food is your biggest saving opportunity. Small weekly changes could save you £${biggest.value} every month.`;
   }
