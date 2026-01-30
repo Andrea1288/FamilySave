@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function SpendingPage() {
@@ -15,27 +15,14 @@ export default function SpendingPage() {
     fun: "",
   });
 
-  // 🔹 Load saved values on page load
-  useEffect(() => {
-    const saved = localStorage.getItem("spending");
-    if (saved) {
-      setValues(JSON.parse(saved));
-    }
-  }, []);
-
-  // 🔹 Save values whenever they change
-  useEffect(() => {
-    localStorage.setItem("spending", JSON.stringify(values));
-  }, [values]);
-
   function calculateAndGo() {
     const breakdown = {
-      home: Math.round(Number(values.home) * 0.05),
-      bills: Math.round(Number(values.bills) * 0.15),
-      food: Math.round(Number(values.food) * 0.2),
-      transport: Math.round(Number(values.transport) * 0.1),
-      kids: Math.round(Number(values.kids) * 0.1),
-      fun: Math.round(Number(values.fun) * 0.25),
+      home: Math.round(Number(values.home || 0) * 0.05),
+      bills: Math.round(Number(values.bills || 0) * 0.15),
+      food: Math.round(Number(values.food || 0) * 0.2),
+      transport: Math.round(Number(values.transport || 0) * 0.1),
+      kids: Math.round(Number(values.kids || 0) * 0.1),
+      fun: Math.round(Number(values.fun || 0) * 0.25),
     };
 
     const total =
@@ -47,15 +34,18 @@ export default function SpendingPage() {
       breakdown.fun;
 
     if (total === 0) {
-      alert("Please enter at least one number 🙂");
+      alert("Please enter at least one expense 🙂");
       return;
     }
 
     const params = new URLSearchParams({
       total: total.toString(),
-      ...Object.fromEntries(
-        Object.entries(breakdown).map(([k, v]) => [k, v.toString()])
-      ),
+      home: breakdown.home.toString(),
+      bills: breakdown.bills.toString(),
+      food: breakdown.food.toString(),
+      transport: breakdown.transport.toString(),
+      kids: breakdown.kids.toString(),
+      fun: breakdown.fun.toString(),
     });
 
     router.push(`/results?${params.toString()}`);
@@ -67,6 +57,7 @@ export default function SpendingPage() {
         <span>{label}</span>
         <input
           type="number"
+          min="0"
           value={values[key]}
           onChange={(e) =>
             setValues({ ...values, [key]: e.target.value })

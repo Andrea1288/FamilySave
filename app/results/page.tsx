@@ -46,7 +46,6 @@ export default function ResultsPage({ searchParams }: ResultsPageProps) {
           £{total} per month
         </p>
 
-        {/* Breakdown */}
         <div className="text-left mb-6">
           <p className="font-semibold mb-3">
             Where the savings come from
@@ -63,7 +62,6 @@ export default function ResultsPage({ searchParams }: ResultsPageProps) {
           ))}
         </div>
 
-        {/* AI Explanation */}
         {biggest && (
           <div className="bg-blue-50 rounded-xl p-4 text-left mb-6">
             <p className="font-semibold mb-1">
@@ -77,7 +75,7 @@ export default function ResultsPage({ searchParams }: ResultsPageProps) {
 
         <a
           href="/family"
-          className="w-full block bg-blue-600 text-white py-3 rounded-xl text-lg"
+          className="block w-full bg-blue-600 text-white py-3 rounded-xl text-lg"
         >
           Start again
         </a>
@@ -86,27 +84,15 @@ export default function ResultsPage({ searchParams }: ResultsPageProps) {
   );
 }
 
-/* ---------------- AI-style explanation logic ---------------- */
-
 function generateInsight(biggest: {
   label: string;
   value: number;
 }) {
   if (biggest.label.includes("Food")) {
-    return `Food is your biggest saving opportunity. Families like yours often spend more here, and small weekly changes could save you £${biggest.value} every month.`;
+    return `Food is your biggest saving opportunity. Small weekly changes could save you £${biggest.value} every month.`;
   }
-
   if (biggest.label.includes("Bills")) {
-    return `Your bills are higher than average. Many families save around £${biggest.value} per month by switching providers or reviewing tariffs.`;
+    return `Bills are often cheaper after switching providers. This could save around £${biggest.value} per month.`;
   }
-
-  if (biggest.label.includes("Fun")) {
-    return `Fun spending is flexible. Setting gentle limits could free up £${biggest.value} per month without affecting your lifestyle.`;
-  }
-
-  if (biggest.label.includes("Transport")) {
-    return `Transport costs add up quickly. Planning ahead or reviewing insurance could save about £${biggest.value} each month.`;
-  }
-
-  return `This category offers a realistic opportunity to save around £${biggest.value} per month with small changes.`;
+  return `This category offers a realistic opportunity to save around £${biggest.value} per month.`;
 }
