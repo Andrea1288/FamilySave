@@ -35,6 +35,10 @@ export default function ResultsPage({ searchParams }: ResultsPageProps) {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50 text-center">
+     <p className="text-xs text-gray-400 mb-2">
+  Results page version: v3
+</p>
+ 
       <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-md">
         <h1 className="text-3xl font-bold mb-2">🎉 Good news!</h1>
 
