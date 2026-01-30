@@ -1,14 +1,19 @@
-"use client";
-
 export const dynamic = "force-dynamic";
 
-import { useSearchParams, useRouter } from "next/navigation";
+type ResultsPageProps = {
+  searchParams: {
+    total?: string;
+    home?: string;
+    bills?: string;
+    food?: string;
+    transport?: string;
+    kids?: string;
+    fun?: string;
+  };
+};
 
-export default function ResultsPage() {
-  const params = useSearchParams();
-  const router = useRouter();
-
-  const total = Number(params.get("total") || 0);
+export default function ResultsPage({ searchParams }: ResultsPageProps) {
+  const total = Number(searchParams.total || 0);
 
   const categories = [
     { key: "home", label: "🏠 Home" },
@@ -22,7 +27,7 @@ export default function ResultsPage() {
   const breakdown = categories
     .map((c) => ({
       ...c,
-      value: Number(params.get(c.key) || 0),
+      value: Number(searchParams[c.key as keyof typeof searchParams] || 0),
     }))
     .filter((c) => c.value > 0);
 
@@ -70,28 +75,12 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {/* Premium Upsell */}
-        <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
-          <p className="font-semibold mb-1">
-            🔓 Unlock smarter savings
-          </p>
-          <p className="text-sm text-gray-700 mb-3">
-            Get personalised tips, monthly tracking, and alerts when bills can be reduced.
-          </p>
-          <button
-            onClick={() => alert("Premium coming soon 🙂")}
-            className="w-full bg-blue-100 text-blue-700 py-2 rounded-lg font-medium"
-          >
-            Try Premium – £4.99/month
-          </button>
-        </div>
-
-        <button
-          onClick={() => router.push("/family")}
-          className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg"
+        <a
+          href="/family"
+          className="w-full block bg-blue-600 text-white py-3 rounded-xl text-lg"
         >
           Start again
-        </button>
+        </a>
       </div>
     </main>
   );
