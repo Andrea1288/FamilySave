@@ -1,3 +1,5 @@
+// RESULTS PAGE VERSION V4 - FORCE CHANGE
+
 "use client";
 
 export const dynamic = "force-dynamic";
@@ -19,28 +21,19 @@ export default function ResultsPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    const parsed = {
-      total: Number(params.get("total") || 0),
-      home: Number(params.get("home") || 0),
-      bills: Number(params.get("bills") || 0),
-      food: Number(params.get("food") || 0),
-      transport: Number(params.get("transport") || 0),
-      kids: Number(params.get("kids") || 0),
-      fun: Number(params.get("fun") || 0),
-    };
+    const totalValue = Number(params.get("total") || 0);
 
-    setTotal(parsed.total);
+    const items: BreakdownItem[] = [
+      { label: "🏠 Home", value: Number(params.get("home") || 0) },
+      { label: "⚡ Bills", value: Number(params.get("bills") || 0) },
+      { label: "🛒 Food", value: Number(params.get("food") || 0) },
+      { label: "🚗 Transport", value: Number(params.get("transport") || 0) },
+      { label: "👶 Kids", value: Number(params.get("kids") || 0) },
+      { label: "🎉 Fun", value: Number(params.get("fun") || 0) },
+    ].filter((item) => item.value > 0);
 
-    setBreakdown(
-      [
-        { label: "🏠 Home", value: parsed.home },
-        { label: "⚡ Bills", value: parsed.bills },
-        { label: "🛒 Food", value: parsed.food },
-        { label: "🚗 Transport", value: parsed.transport },
-        { label: "👶 Kids", value: parsed.kids },
-        { label: "🎉 Fun", value: parsed.fun },
-      ].filter((item) => item.value > 0)
-    );
+    setTotal(totalValue);
+    setBreakdown(items);
   }, []);
 
   const biggest = [...breakdown].sort((a, b) => b.value - a.value)[0];
@@ -104,8 +97,10 @@ function generateInsight(biggest: BreakdownItem) {
   if (biggest.label.includes("Food")) {
     return `Food is your biggest saving opportunity. Small weekly changes could save you £${biggest.value} every month.`;
   }
+
   if (biggest.label.includes("Bills")) {
     return `Bills are often cheaper after switching providers. This could save around £${biggest.value} per month.`;
   }
+
   return `This category offers a realistic opportunity to save around £${biggest.value} per month.`;
 }
