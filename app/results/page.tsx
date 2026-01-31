@@ -1,44 +1,56 @@
+"use client";
+
 export const dynamic = "force-dynamic";
 
-type ResultsPageProps = {
-  searchParams: {
-    total?: string;
-    home?: string;
-    bills?: string;
-    food?: string;
-    transport?: string;
-    kids?: string;
-    fun?: string;
-  };
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+type BreakdownItem = {
+  label: string;
+  value: number;
 };
 
-export default function ResultsPage({ searchParams }: ResultsPageProps) {
-  // 🔒 Explicit parsing (this is the fix)
-  const total = Number(searchParams.total ?? 0);
-  const home = Number(searchParams.home ?? 0);
-  const bills = Number(searchParams.bills ?? 0);
-  const food = Number(searchParams.food ?? 0);
-  const transport = Number(searchParams.transport ?? 0);
-  const kids = Number(searchParams.kids ?? 0);
-  const fun = Number(searchParams.fun ?? 0);
+export default function ResultsPage() {
+  const router = useRouter();
 
-  const breakdown = [
-    { label: "🏠 Home", value: home },
-    { label: "⚡ Bills", value: bills },
-    { label: "🛒 Food", value: food },
-    { label: "🚗 Transport", value: transport },
-    { label: "👶 Kids", value: kids },
-    { label: "🎉 Fun", value: fun },
-  ].filter((item) => item.value > 0);
+  const [total, setTotal] = useState(0);
+  const [breakdown, setBreakdown] = useState<BreakdownItem[]>([]);
 
-  const biggest = breakdown.sort((a, b) => b.value - a.value)[0];
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const parsed = {
+      total: Number(params.get("total") || 0),
+      home: Number(params.get("home") || 0),
+      bills: Number(params.get("bills") || 0),
+      food: Number(params.get("food") || 0),
+      transport: Number(params.get("transport") || 0),
+      kids: Number(params.get("kids") || 0),
+      fun: Number(params.get("fun") || 0),
+    };
+
+    setTotal(parsed.total);
+
+    setBreakdown(
+      [
+        { label: "🏠 Home", value: parsed.home },
+        { label: "⚡ Bills", value: parsed.bills },
+        { label: "🛒 Food", value: parsed.food },
+        { label: "🚗 Transport", value: parsed.transport },
+        { label: "👶 Kids", value: parsed.kids },
+        { label: "🎉 Fun", value: parsed.fun },
+      ].filter((item) => item.value > 0)
+    );
+  }, []);
+
+  const biggest = [...breakdown].sort((a, b) => b.value - a.value)[0];
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50 text-center">
-     <p className="text-xs text-gray-400 mb-2">
-  Results page version: v3
-</p>
- 
+      <p className="text-xs text-gray-400 mb-2">
+        Results page version: v4
+      </p>
+
       <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-md">
         <h1 className="text-3xl font-bold mb-2">🎉 Good news!</h1>
 
@@ -77,18 +89,18 @@ export default function ResultsPage({ searchParams }: ResultsPageProps) {
           </div>
         )}
 
-        <a
-          href="/family"
-          className="block w-full bg-blue-600 text-white py-3 rounded-xl text-lg"
+        <button
+          onClick={() => router.push("/family")}
+          className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg"
         >
           Start again
-        </a>
+        </button>
       </div>
     </main>
   );
 }
 
-function generateInsight(biggest: { label: string; value: number }) {
+function generateInsight(biggest: BreakdownItem) {
   if (biggest.label.includes("Food")) {
     return `Food is your biggest saving opportunity. Small weekly changes could save you £${biggest.value} every month.`;
   }
