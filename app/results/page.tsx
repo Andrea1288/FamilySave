@@ -1,8 +1,4 @@
-// RESULTS PAGE VERSION V4 - FORCE CHANGE
-
 "use client";
-
-export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,33 +17,39 @@ export default function ResultsPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    const totalValue = Number(params.get("total") || 0);
+    const parsed = {
+      total: Number(params.get("total") || 0),
+      home: Number(params.get("home") || 0),
+      bills: Number(params.get("bills") || 0),
+      food: Number(params.get("food") || 0),
+      transport: Number(params.get("transport") || 0),
+      kids: Number(params.get("kids") || 0),
+      fun: Number(params.get("fun") || 0),
+    };
 
-    const items: BreakdownItem[] = [
-      { label: "🏠 Home", value: Number(params.get("home") || 0) },
-      { label: "⚡ Bills", value: Number(params.get("bills") || 0) },
-      { label: "🛒 Food", value: Number(params.get("food") || 0) },
-      { label: "🚗 Transport", value: Number(params.get("transport") || 0) },
-      { label: "👶 Kids", value: Number(params.get("kids") || 0) },
-      { label: "🎉 Fun", value: Number(params.get("fun") || 0) },
-    ].filter((item) => item.value > 0);
+    setTotal(parsed.total);
 
-    setTotal(totalValue);
-    setBreakdown(items);
+    setBreakdown(
+      [
+        { label: "🏠 Home", value: parsed.home },
+        { label: "⚡ Bills", value: parsed.bills },
+        { label: "🛒 Food", value: parsed.food },
+        { label: "🚗 Transport", value: parsed.transport },
+        { label: "👶 Kids", value: parsed.kids },
+        { label: "🎉 Fun", value: parsed.fun },
+      ].filter((item) => item.value > 0)
+    );
   }, []);
 
   const biggest = [...breakdown].sort((a, b) => b.value - a.value)[0];
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gray-50 text-center">
-      <p className="text-xs text-gray-400 mb-2">
-        Results page version: v4
-      </p>
-
-      <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-md">
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
+        {/* Header */}
         <h1 className="text-3xl font-bold mb-2">🎉 Good news!</h1>
 
-        <p className="text-lg text-gray-600 mb-2">
+        <p className="text-gray-600 mb-1">
           Your family could save about
         </p>
 
@@ -55,6 +57,7 @@ export default function ResultsPage() {
           £{total} per month
         </p>
 
+        {/* Breakdown */}
         <div className="text-left mb-6">
           <p className="font-semibold mb-3">
             Where the savings come from
@@ -71,6 +74,7 @@ export default function ResultsPage() {
           ))}
         </div>
 
+        {/* AI Explanation */}
         {biggest && (
           <div className="bg-blue-50 rounded-xl p-4 text-left mb-6">
             <p className="font-semibold mb-1">
@@ -82,6 +86,23 @@ export default function ResultsPage() {
           </div>
         )}
 
+        {/* Premium Upsell */}
+        <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
+          <p className="font-semibold mb-1">
+            🔓 Unlock smarter savings
+          </p>
+          <p className="text-sm text-gray-700 mb-3">
+            Get personalised tips, monthly tracking, and alerts when bills can be reduced.
+          </p>
+          <button
+            onClick={() => alert("Premium coming soon 🙂")}
+            className="w-full bg-blue-100 text-blue-700 py-2 rounded-lg font-medium"
+          >
+            Try Premium – £4.99/month
+          </button>
+        </div>
+
+        {/* Restart */}
         <button
           onClick={() => router.push("/family")}
           className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg"
@@ -93,14 +114,20 @@ export default function ResultsPage() {
   );
 }
 
+/* -------- AI-style explanation logic -------- */
+
 function generateInsight(biggest: BreakdownItem) {
   if (biggest.label.includes("Food")) {
-    return `Food is your biggest saving opportunity. Small weekly changes could save you £${biggest.value} every month.`;
+    return `Food is your biggest saving opportunity. Families like yours often spend more here, and small weekly changes could save you £${biggest.value} every month.`;
   }
 
   if (biggest.label.includes("Bills")) {
-    return `Bills are often cheaper after switching providers. This could save around £${biggest.value} per month.`;
+    return `Bills are often cheaper after switching providers. Many families save around £${biggest.value} per month just by reviewing tariffs.`;
   }
 
-  return `This category offers a realistic opportunity to save around £${biggest.value} per month.`;
+  if (biggest.label.includes("Fun")) {
+    return `Fun spending is flexible. Setting gentle limits could free up £${biggest.value} each month without affecting your lifestyle.`;
+  }
+
+  return `This category offers a realistic opportunity to save around £${biggest.value} per month with small adjustments.`;
 }
