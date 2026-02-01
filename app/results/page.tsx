@@ -86,7 +86,7 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {/* Premium Upsell */}
+        {/* Premium Section */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
             🔓 Unlock smarter savings
@@ -114,20 +114,24 @@ export default function ResultsPage() {
   );
 }
 
-/* -------- AI-style explanation logic -------- */
+/* ---------- Improved AI explanation ---------- */
 
 function generateInsight(biggest: BreakdownItem) {
   if (biggest.label.includes("Food")) {
-    return `Food is your biggest saving opportunity. Families like yours often spend more here, and small weekly changes could save you £${biggest.value} every month.`;
+    return `You spend more on food than most similar families. This usually comes from takeaways, snacks, or unplanned shopping. Cutting just a few purchases per week could save you £${biggest.value} every month.`;
   }
 
   if (biggest.label.includes("Bills")) {
-    return `Bills are often cheaper after switching providers. Many families save around £${biggest.value} per month just by reviewing tariffs.`;
+    return `Your bills are higher than average. Many families save this amount simply by switching energy or broadband providers once a year. That could free up £${biggest.value} every month without changing habits.`;
+  }
+
+  if (biggest.label.includes("Transport")) {
+    return `Transport costs often hide small leaks like insurance renewals or inefficient routes. Reviewing these could realistically save around £${biggest.value} per month.`;
   }
 
   if (biggest.label.includes("Fun")) {
-    return `Fun spending is flexible. Setting gentle limits could free up £${biggest.value} each month without affecting your lifestyle.`;
+    return `Fun spending grows quietly over time. Setting light monthly limits could help you keep enjoying life while saving £${biggest.value} each month.`;
   }
 
-  return `This category offers a realistic opportunity to save around £${biggest.value} per month with small adjustments.`;
+  return `This category shows a realistic opportunity to save about £${biggest.value} per month with small, manageable changes.`;
 }
