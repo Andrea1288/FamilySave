@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FamilySave 💙
 
-## Getting Started
+FamilySave is a simple web app that helps families understand where they can save money — without spreadsheets, banks, or stress.
 
-First, run the development server:
+## 🚀 What it does
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Families enter rough monthly expenses
+2. The app calculates realistic savings
+3. Results are explained in plain English
+4. Users see where small changes make a big difference
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+No accounts. No bank connection. No judgement.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧠 Why it works
 
-## Learn More
+Most budgeting apps fail because they are:
+- Too complex
+- Too judgemental
+- Too time-consuming
 
-To learn more about Next.js, take a look at the following resources:
+FamilySave focuses on:
+- **Clarity**
+- **Reassurance**
+- **Actionable insights**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ✨ Key Features
 
-## Deploy on Vercel
+- 🧮 Automatic savings calculation
+- 📊 Category breakdown (food, bills, transport, etc.)
+- 🤖 AI-style explanations (“why you can save this much”)
+- 💾 Remembers inputs (no retyping)
+- 🔓 Optional premium upgrade (future)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 💸 Monetisation
+
+FamilySave uses a **freemium model**:
+
+**Free**
+- Savings calculation
+- Breakdown
+- AI explanation
+
+**Premium (£4.99/month)**
+- Deeper insights
+- Monthly tracking
+- Alerts when savings opportunities appear
+- (Future) bill switching
+
+---
+
+## 🛡️ Privacy & Trust
+
+- No bank connections
+- No personal data stored
+- No ads
+- No dark patterns
+
+Built to feel safe and human.
+
+---
+
+## 🧪 Status
+
+This is an MVP used for:
+- User testing
+- Feedback
+- Iteration
+
+---
+
+## 🌍 Live Demo
+
+👉 https://family-save-6lpz.vercel.app
+
+---
+
+## 👤 Built by
+
+Andrea Ghezzo  
+Exploring human-friendly financial tools.
