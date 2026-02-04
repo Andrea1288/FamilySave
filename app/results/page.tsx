@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-type BreakdownItem = {
+type Item = {
   label: string;
   value: number;
 };
@@ -18,14 +18,15 @@ export default function ResultsPage() {
   const router = useRouter();
 
   const [total, setTotal] = useState(0);
-  const [breakdown, setBreakdown] = useState<BreakdownItem[]>([]);
+  const [now, setNow] = useState<Item[]>([]);
+  const [soon, setSoon] = useState<Item[]>([]);
+  const [later, setLater] = useState<Item[]>([]);
   const [contracts, setContracts] = useState<Contracts>({});
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    const parsed = {
-      total: Number(params.get("total") || 0),
+    const values = {
       home: Number(params.get("home") || 0),
       bills: Number(params.get("bills") || 0),
       food: Number(params.get("food") || 0),
@@ -34,108 +35,107 @@ export default function ResultsPage() {
       fun: Number(params.get("fun") || 0),
     };
 
-    setTotal(parsed.total);
-
-    setBreakdown(
-      [
-        { label: "🏠 Home", value: parsed.home },
-        { label: "⚡ Bills", value: parsed.bills },
-        { label: "🛒 Food", value: parsed.food },
-        { label: "🚗 Transport", value: parsed.transport },
-        { label: "👶 Kids", value: parsed.kids },
-        { label: "🎉 Fun", value: parsed.fun },
-      ].filter((i) => i.value > 0)
-    );
+    const totalValue = Number(params.get("total") || 0);
+    setTotal(totalValue);
 
     // Load contract info
     const savedContracts = localStorage.getItem("familysave_contracts");
     if (savedContracts) {
       setContracts(JSON.parse(savedContracts));
     }
+
+    // Timeline logic
+    setNow(
+      [
+        { label: "🛒 Food", value: values.food },
+        { label: "🎉 Fun", value: values.fun },
+      ].filter((i) => i.value > 0)
+    );
+
+    setSoon(
+      [
+        { label: "⚡ Bills", value: values.bills },
+        { label: "🌐 Internet", value: values.transport },
+      ].filter((i) => i.value > 0)
+    );
+
+    setLater(
+      [
+        { label: "🏠 Home", value: values.home },
+        { label: "👶 Kids", value: values.kids },
+      ].filter((i) => i.value > 0)
+    );
   }, []);
 
-  const biggest = [...breakdown].sort((a, b) => b.value - a.value)[0];
+  function Section(
+    title: string,
+    subtitle: string,
+    items: Item[],
+    color: string
+  ) {
+    if (items.length === 0) return null;
 
-  function contractReminder() {
-    if (contracts.energy) {
-      return `⚡ Energy: best time to switch in ${contracts.energy}`;
-    }
-    if (contracts.internet) {
-      return `🌐 Internet: review contract in ${contracts.internet}`;
-    }
-    if (contracts.mobile) {
-      return `📱 Mobile: potential savings from ${contracts.mobile}`;
-    }
-    return null;
+    return (
+      <div className={`rounded-xl p-4 mb-4 ${color}`}>
+        <p className="font-semibold mb-1">{title}</p>
+        <p className="text-sm text-gray-600 mb-3">{subtitle}</p>
+
+        {items.map((i) => (
+          <div key={i.label} className="flex justify-between py-1">
+            <span>{i.label}</span>
+            <span className="font-medium">£{i.value}</span>
+          </div>
+        ))}
+      </div>
+    );
   }
-
-  const reminder = contractReminder();
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-        <h1 className="text-3xl font-bold mb-2">🎉 Good news!</h1>
+        <h1 className="text-3xl font-bold mb-2">🎉 Your savings timeline</h1>
 
-        <p className="text-gray-600 mb-1">
-          Your family could save about
+        <p className="text-gray-600 mb-2">
+          You could save about
         </p>
 
-        <p className="text-4xl font-bold text-blue-600 mb-2">
+        <p className="text-4xl font-bold text-blue-600 mb-4">
           £{total} per month
         </p>
 
         <p className="text-sm text-gray-500 mb-6">
-          Some savings happen now. Others happen over time when contracts end.
+          Savings happen at different times — this shows when each one becomes realistic.
         </p>
 
-        {/* Breakdown */}
-        <div className="text-left mb-6">
-          <p className="font-semibold mb-3">
-            Where the savings come from
-          </p>
-
-          {breakdown.map((item) => (
-            <div
-              key={item.label}
-              className="flex justify-between py-2 border-b last:border-b-0"
-            >
-              <span>{item.label}</span>
-              <span className="font-medium">£{item.value}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Contract reminder */}
-        {reminder && (
-          <div className="bg-yellow-50 rounded-xl p-4 text-left mb-6">
-            <p className="font-semibold mb-1">
-              ⏰ When to act
-            </p>
-            <p className="text-sm text-gray-700">
-              {reminder}
-            </p>
-          </div>
+        {/* Timeline */}
+        {Section(
+          "🟢 Now",
+          "Savings you can act on immediately",
+          now,
+          "bg-green-50"
         )}
 
-        {/* AI explanation */}
-        {biggest && (
-          <div className="bg-blue-50 rounded-xl p-4 text-left mb-6">
-            <p className="font-semibold mb-1">
-              🤖 Why you can save this much
-            </p>
-            <p className="text-sm text-gray-700">
-              {generateInsight(biggest)}
-            </p>
-          </div>
+        {Section(
+          "🟡 Soon",
+          "Savings when contracts end or renew",
+          soon,
+          "bg-yellow-50"
+        )}
+
+        {Section(
+          "🔵 Later",
+          "Longer-term or harder-to-change savings",
+          later,
+          "bg-blue-50"
         )}
 
         {/* Premium hint */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
-            🔓 Never miss a contract switch
+            🔓 Know exactly when to act
           </p>
           <p className="text-sm text-gray-700 mb-3">
-            Premium users get reminders before contracts end.
+            Premium users get reminders and a clear action plan.
           </p>
           <button
             onClick={() => alert("Premium coming soon 🙂")}
@@ -154,14 +154,4 @@ export default function ResultsPage() {
       </div>
     </main>
   );
-}
-
-function generateInsight(biggest: BreakdownItem) {
-  if (biggest.label.includes("Bills")) {
-    return `Bills are often locked for a period. The real saving comes when you act at the right time — usually at renewal — which could save around £${biggest.value} per month.`;
-  }
-  if (biggest.label.includes("Food")) {
-    return `Food savings are usually immediate. Small habit changes could realistically save £${biggest.value} every month.`;
-  }
-  return `This category shows a realistic opportunity to save about £${biggest.value} per month.`;
 }
