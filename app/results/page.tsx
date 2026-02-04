@@ -8,12 +8,6 @@ type Item = {
   value: number;
 };
 
-type Contracts = {
-  energy?: string;
-  internet?: string;
-  mobile?: string;
-};
-
 export default function ResultsPage() {
   const router = useRouter();
 
@@ -21,7 +15,6 @@ export default function ResultsPage() {
   const [now, setNow] = useState<Item[]>([]);
   const [soon, setSoon] = useState<Item[]>([]);
   const [later, setLater] = useState<Item[]>([]);
-  const [contracts, setContracts] = useState<Contracts>({});
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -38,13 +31,7 @@ export default function ResultsPage() {
     const totalValue = Number(params.get("total") || 0);
     setTotal(totalValue);
 
-    // Load contract info
-    const savedContracts = localStorage.getItem("familysave_contracts");
-    if (savedContracts) {
-      setContracts(JSON.parse(savedContracts));
-    }
-
-    // Timeline logic
+    // NOW: flexible spending
     setNow(
       [
         { label: "🛒 Food", value: values.food },
@@ -52,13 +39,15 @@ export default function ResultsPage() {
       ].filter((i) => i.value > 0)
     );
 
+    // SOON: contract-based
     setSoon(
       [
         { label: "⚡ Bills", value: values.bills },
-        { label: "🌐 Internet", value: values.transport },
+        { label: "🚗 Transport", value: values.transport },
       ].filter((i) => i.value > 0)
     );
 
+    // LATER: harder / long-term
     setLater(
       [
         { label: "🏠 Home", value: values.home },
@@ -71,17 +60,20 @@ export default function ResultsPage() {
     title: string,
     subtitle: string,
     items: Item[],
-    color: string
+    bg: string
   ) {
     if (items.length === 0) return null;
 
     return (
-      <div className={`rounded-xl p-4 mb-4 ${color}`}>
+      <div className={`rounded-xl p-4 mb-4 ${bg}`}>
         <p className="font-semibold mb-1">{title}</p>
         <p className="text-sm text-gray-600 mb-3">{subtitle}</p>
 
         {items.map((i) => (
-          <div key={i.label} className="flex justify-between py-1">
+          <div
+            key={i.label}
+            className="flex justify-between py-1"
+          >
             <span>{i.label}</span>
             <span className="font-medium">£{i.value}</span>
           </div>
@@ -93,7 +85,15 @@ export default function ResultsPage() {
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-        <h1 className="text-3xl font-bold mb-2">🎉 Your savings timeline</h1>
+
+        {/* VERSION MARKER */}
+        <p className="text-xs text-gray-400 mb-2">
+          Results page version: timeline-v2
+        </p>
+
+        <h1 className="text-3xl font-bold mb-2">
+          📅 Your savings timeline
+        </h1>
 
         <p className="text-gray-600 mb-2">
           You could save about
@@ -107,7 +107,7 @@ export default function ResultsPage() {
           Savings happen at different times — this shows when each one becomes realistic.
         </p>
 
-        {/* Timeline */}
+        {/* TIMELINE SECTIONS */}
         {Section(
           "🟢 Now",
           "Savings you can act on immediately",
@@ -129,7 +129,7 @@ export default function ResultsPage() {
           "bg-blue-50"
         )}
 
-        {/* Premium hint */}
+        {/* PREMIUM */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
             🔓 Know exactly when to act
