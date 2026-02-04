@@ -53,8 +53,13 @@ export default function ResultsPage() {
           Your family could save about
         </p>
 
-        <p className="text-4xl font-bold text-blue-600 mb-6">
+        <p className="text-4xl font-bold text-blue-600 mb-2">
           £{total} per month
+        </p>
+
+        {/* 🔑 ONE-LINER EXPLANATION */}
+        <p className="text-sm text-gray-500 mb-6">
+          Some savings happen now. Others happen over time when contracts end — this shows what’s realistically achievable.
         </p>
 
         {/* Breakdown */}
@@ -86,7 +91,7 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {/* Premium Section */}
+        {/* Premium */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
             🔓 Unlock smarter savings
@@ -114,24 +119,24 @@ export default function ResultsPage() {
   );
 }
 
-/* ---------- Improved AI explanation ---------- */
+/* ---------- AI explanation ---------- */
 
 function generateInsight(biggest: BreakdownItem) {
   if (biggest.label.includes("Food")) {
-    return `You spend more on food than most similar families. This usually comes from takeaways, snacks, or unplanned shopping. Cutting just a few purchases per week could save you £${biggest.value} every month.`;
+    return `You spend more on food than most similar families. This often comes from takeaways or unplanned shopping. Small weekly changes could save you £${biggest.value} every month.`;
   }
 
   if (biggest.label.includes("Bills")) {
-    return `Your bills are higher than average. Many families save this amount simply by switching energy or broadband providers once a year. That could free up £${biggest.value} every month without changing habits.`;
+    return `Your bills are higher than average. Many families save this amount by switching providers when contracts end. That could free up £${biggest.value} per month.`;
   }
 
   if (biggest.label.includes("Transport")) {
-    return `Transport costs often hide small leaks like insurance renewals or inefficient routes. Reviewing these could realistically save around £${biggest.value} per month.`;
+    return `Transport costs often hide small leaks like insurance renewals or inefficient routes. Reviewing these could save around £${biggest.value} per month.`;
   }
 
   if (biggest.label.includes("Fun")) {
-    return `Fun spending grows quietly over time. Setting light monthly limits could help you keep enjoying life while saving £${biggest.value} each month.`;
+    return `Fun spending grows quietly over time. Setting gentle limits could help you keep enjoying life while saving £${biggest.value} each month.`;
   }
 
-  return `This category shows a realistic opportunity to save about £${biggest.value} per month with small, manageable changes.`;
+  return `This category shows a realistic opportunity to save about £${biggest.value} per month with manageable changes.`;
 }
