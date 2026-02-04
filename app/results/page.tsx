@@ -28,10 +28,8 @@ export default function ResultsPage() {
       fun: Number(params.get("fun") || 0),
     };
 
-    const totalValue = Number(params.get("total") || 0);
-    setTotal(totalValue);
+    setTotal(Number(params.get("total") || 0));
 
-    // NOW: flexible spending
     setNow(
       [
         { label: "🛒 Food", value: values.food },
@@ -39,7 +37,6 @@ export default function ResultsPage() {
       ].filter((i) => i.value > 0)
     );
 
-    // SOON: contract-based
     setSoon(
       [
         { label: "⚡ Bills", value: values.bills },
@@ -47,7 +44,6 @@ export default function ResultsPage() {
       ].filter((i) => i.value > 0)
     );
 
-    // LATER: harder / long-term
     setLater(
       [
         { label: "🏠 Home", value: values.home },
@@ -59,6 +55,7 @@ export default function ResultsPage() {
   function Section(
     title: string,
     subtitle: string,
+    action: string,
     items: Item[],
     bg: string
   ) {
@@ -67,17 +64,18 @@ export default function ResultsPage() {
     return (
       <div className={`rounded-xl p-4 mb-4 ${bg}`}>
         <p className="font-semibold mb-1">{title}</p>
-        <p className="text-sm text-gray-600 mb-3">{subtitle}</p>
+        <p className="text-sm text-gray-600 mb-2">{subtitle}</p>
 
         {items.map((i) => (
-          <div
-            key={i.label}
-            className="flex justify-between py-1"
-          >
+          <div key={i.label} className="flex justify-between py-1">
             <span>{i.label}</span>
             <span className="font-medium">£{i.value}</span>
           </div>
         ))}
+
+        <p className="text-xs text-gray-500 mt-3">
+          👉 {action}
+        </p>
       </div>
     );
   }
@@ -85,11 +83,6 @@ export default function ResultsPage() {
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-
-        {/* VERSION MARKER */}
-        <p className="text-xs text-gray-400 mb-2">
-          Results page version: timeline-v2
-        </p>
 
         <h1 className="text-3xl font-bold mb-2">
           📅 Your savings timeline
@@ -104,13 +97,13 @@ export default function ResultsPage() {
         </p>
 
         <p className="text-sm text-gray-500 mb-6">
-          Savings happen at different times — this shows when each one becomes realistic.
+          Savings happen at different times — here’s what to do, and when.
         </p>
 
-        {/* TIMELINE SECTIONS */}
         {Section(
           "🟢 Now",
           "Savings you can act on immediately",
+          "Start with small changes like fewer takeaways or cancelling unused subscriptions.",
           now,
           "bg-green-50"
         )}
@@ -118,6 +111,7 @@ export default function ResultsPage() {
         {Section(
           "🟡 Soon",
           "Savings when contracts end or renew",
+          "Set a reminder to review or switch providers when contracts end.",
           soon,
           "bg-yellow-50"
         )}
@@ -125,17 +119,17 @@ export default function ResultsPage() {
         {Section(
           "🔵 Later",
           "Longer-term or harder-to-change savings",
+          "Review these once a year — they matter, but don’t need urgent action.",
           later,
           "bg-blue-50"
         )}
 
-        {/* PREMIUM */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
-            🔓 Know exactly when to act
+            🔓 Want help remembering?
           </p>
           <p className="text-sm text-gray-700 mb-3">
-            Premium users get reminders and a clear action plan.
+            Premium users get reminders and step-by-step guidance.
           </p>
           <button
             onClick={() => alert("Premium coming soon 🙂")}
