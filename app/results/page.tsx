@@ -8,11 +8,17 @@ type BreakdownItem = {
   value: number;
 };
 
+type HistoryItem = {
+  date: string;
+  total: number;
+};
+
 export default function ResultsPage() {
   const router = useRouter();
 
   const [total, setTotal] = useState(0);
   const [breakdown, setBreakdown] = useState<BreakdownItem[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -29,16 +35,36 @@ export default function ResultsPage() {
 
     setTotal(parsed.total);
 
-    setBreakdown(
-      [
-        { label: "🏠 Home", value: parsed.home },
-        { label: "⚡ Bills", value: parsed.bills },
-        { label: "🛒 Food", value: parsed.food },
-        { label: "🚗 Transport", value: parsed.transport },
-        { label: "👶 Kids", value: parsed.kids },
-        { label: "🎉 Fun", value: parsed.fun },
-      ].filter((item) => item.value > 0)
+    const items = [
+      { label: "🏠 Home", value: parsed.home },
+      { label: "⚡ Bills", value: parsed.bills },
+      { label: "🛒 Food", value: parsed.food },
+      { label: "🚗 Transport", value: parsed.transport },
+      { label: "👶 Kids", value: parsed.kids },
+      { label: "🎉 Fun", value: parsed.fun },
+    ].filter((i) => i.value > 0);
+
+    setBreakdown(items);
+
+    // Save history
+    const stored =
+      JSON.parse(localStorage.getItem("familysave_history") || "[]");
+
+    const today = new Date().toLocaleDateString();
+
+    const newEntry: HistoryItem = {
+      date: today,
+      total: parsed.total,
+    };
+
+    const updated = [newEntry, ...stored].slice(0, 5);
+
+    localStorage.setItem(
+      "familysave_history",
+      JSON.stringify(updated)
     );
+
+    setHistory(updated);
   }, []);
 
   const biggest = [...breakdown].sort((a, b) => b.value - a.value)[0];
@@ -46,7 +72,6 @@ export default function ResultsPage() {
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-        {/* Header */}
         <h1 className="text-3xl font-bold mb-2">🎉 Good news!</h1>
 
         <p className="text-gray-600 mb-1">
@@ -57,9 +82,8 @@ export default function ResultsPage() {
           £{total} per month
         </p>
 
-        {/* 🔑 ONE-LINER EXPLANATION */}
         <p className="text-sm text-gray-500 mb-6">
-          Some savings happen now. Others happen over time when contracts end — this shows what’s realistically achievable.
+          Some savings happen now. Others happen over time when contracts end.
         </p>
 
         {/* Breakdown */}
@@ -79,7 +103,7 @@ export default function ResultsPage() {
           ))}
         </div>
 
-        {/* AI Explanation */}
+        {/* AI explanation */}
         {biggest && (
           <div className="bg-blue-50 rounded-xl p-4 text-left mb-6">
             <p className="font-semibold mb-1">
@@ -91,13 +115,31 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {/* Premium */}
+        {/* History */}
+        {history.length > 1 && (
+          <div className="bg-gray-50 rounded-xl p-4 text-left mb-6">
+            <p className="font-semibold mb-2">
+              📈 Your previous results
+            </p>
+            {history.map((h, i) => (
+              <div
+                key={i}
+                className="flex justify-between text-sm py-1"
+              >
+                <span>{h.date}</span>
+                <span>£{h.total}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Premium hint */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
-            🔓 Unlock smarter savings
+            🔓 Track your progress
           </p>
           <p className="text-sm text-gray-700 mb-3">
-            Get personalised tips, monthly tracking, and alerts when bills can be reduced.
+            Premium users get full history, trends, and alerts.
           </p>
           <button
             onClick={() => alert("Premium coming soon 🙂")}
@@ -107,7 +149,6 @@ export default function ResultsPage() {
           </button>
         </div>
 
-        {/* Restart */}
         <button
           onClick={() => router.push("/family")}
           className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg"
@@ -119,24 +160,12 @@ export default function ResultsPage() {
   );
 }
 
-/* ---------- AI explanation ---------- */
-
 function generateInsight(biggest: BreakdownItem) {
   if (biggest.label.includes("Food")) {
-    return `You spend more on food than most similar families. This often comes from takeaways or unplanned shopping. Small weekly changes could save you £${biggest.value} every month.`;
+    return `Food is your biggest opportunity. Small weekly changes could save you £${biggest.value} every month.`;
   }
-
   if (biggest.label.includes("Bills")) {
-    return `Your bills are higher than average. Many families save this amount by switching providers when contracts end. That could free up £${biggest.value} per month.`;
+    return `Bills are often cheaper at renewal. Switching could save you around £${biggest.value} per month.`;
   }
-
-  if (biggest.label.includes("Transport")) {
-    return `Transport costs often hide small leaks like insurance renewals or inefficient routes. Reviewing these could save around £${biggest.value} per month.`;
-  }
-
-  if (biggest.label.includes("Fun")) {
-    return `Fun spending grows quietly over time. Setting gentle limits could help you keep enjoying life while saving £${biggest.value} each month.`;
-  }
-
-  return `This category shows a realistic opportunity to save about £${biggest.value} per month with manageable changes.`;
+  return `This category shows a realistic way to save about £${biggest.value} per month.`;
 }
