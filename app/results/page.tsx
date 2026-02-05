@@ -15,6 +15,7 @@ export default function ResultsPage() {
   const [now, setNow] = useState<Item[]>([]);
   const [soon, setSoon] = useState<Item[]>([]);
   const [later, setLater] = useState<Item[]>([]);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -52,6 +53,14 @@ export default function ResultsPage() {
     );
   }, []);
 
+  function savePlan() {
+    localStorage.setItem(
+      "familysave_last_plan",
+      new Date().toISOString()
+    );
+    setSaved(true);
+  }
+
   function Section(
     title: string,
     subtitle: string,
@@ -74,7 +83,7 @@ export default function ResultsPage() {
         ))}
 
         <p className="text-xs text-gray-500 mt-3">
-          👉 {action}
+          💡 {action}
         </p>
       </div>
     );
@@ -85,51 +94,76 @@ export default function ResultsPage() {
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
 
         <h1 className="text-3xl font-bold mb-2">
-          📅 Your savings timeline
+          📅 Your savings plan
         </h1>
 
-        <p className="text-gray-600 mb-2">
-          You could save about
+        <p className="text-gray-600 mb-1">
+          You could save up to
         </p>
 
-        <p className="text-4xl font-bold text-blue-600 mb-4">
+        <p className="text-4xl font-bold text-blue-600 mb-2">
           £{total} per month
         </p>
 
         <p className="text-sm text-gray-500 mb-6">
-          Savings happen at different times — here’s what to do, and when.
+          Some savings are immediate. Others become available over time as contracts end.
         </p>
 
         {Section(
           "🟢 Now",
-          "Savings you can act on immediately",
-          "Start with small changes like fewer takeaways or cancelling unused subscriptions.",
+          "Easy wins you can act on whenever you’re ready",
+          "If you want to start small, fewer takeaways or unused subscriptions are often the easiest changes.",
           now,
           "bg-green-50"
         )}
 
         {Section(
           "🟡 Soon",
-          "Savings when contracts end or renew",
-          "Set a reminder to review or switch providers when contracts end.",
+          "Savings that unlock when contracts renew",
+          "When these contracts end, reviewing or switching providers can make a big difference.",
           soon,
           "bg-yellow-50"
         )}
 
         {Section(
           "🔵 Later",
-          "Longer-term or harder-to-change savings",
-          "Review these once a year — they matter, but don’t need urgent action.",
+          "Longer-term savings to revisit occasionally",
+          "These don’t need urgent action — a yearly check is usually enough.",
           later,
           "bg-blue-50"
         )}
 
+        {/* Save plan */}
+        <div className="rounded-xl p-4 mb-6 bg-gray-50">
+          {!saved ? (
+            <>
+              <p className="font-semibold mb-2">
+                💾 Save this plan
+              </p>
+              <p className="text-sm text-gray-600 mb-3">
+                You can come back to this anytime. No pressure to act now.
+              </p>
+              <button
+                onClick={savePlan}
+                className="w-full bg-blue-600 text-white py-2 rounded-lg"
+              >
+                Save my plan
+              </button>
+            </>
+          ) : (
+            <p className="text-sm text-green-700">
+              ✔ Plan saved. You can revisit it whenever you’re ready.
+            </p>
+          )}
+        </div>
+
+        {/* Premium hint */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
-            🔓 Want help remembering?
+            🔓 Want gentle reminders?
           </p>
           <p className="text-sm text-gray-700 mb-3">
-            Premium users get reminders and step-by-step guidance.
+            Premium helps you remember when savings become available.
           </p>
           <button
             onClick={() => alert("Premium coming soon 🙂")}
