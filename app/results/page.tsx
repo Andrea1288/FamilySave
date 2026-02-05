@@ -15,7 +15,6 @@ export default function ResultsPage() {
   const [now, setNow] = useState<Item[]>([]);
   const [soon, setSoon] = useState<Item[]>([]);
   const [later, setLater] = useState<Item[]>([]);
-  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -33,58 +32,50 @@ export default function ResultsPage() {
 
     setNow(
       [
-        { label: "🛒 Food", value: values.food },
-        { label: "🎉 Fun", value: values.fun },
+        { label: "Food", value: values.food },
+        { label: "Fun", value: values.fun },
       ].filter((i) => i.value > 0)
     );
 
     setSoon(
       [
-        { label: "⚡ Bills", value: values.bills },
-        { label: "🚗 Transport", value: values.transport },
+        { label: "Bills", value: values.bills },
+        { label: "Transport", value: values.transport },
       ].filter((i) => i.value > 0)
     );
 
     setLater(
       [
-        { label: "🏠 Home", value: values.home },
-        { label: "👶 Kids", value: values.kids },
+        { label: "Home", value: values.home },
+        { label: "Kids", value: values.kids },
       ].filter((i) => i.value > 0)
     );
   }, []);
 
-  function savePlan() {
-    localStorage.setItem(
-      "familysave_last_plan",
-      new Date().toISOString()
-    );
-    setSaved(true);
-  }
+  const sum = (items: Item[]) =>
+    items.reduce((acc, i) => acc + i.value, 0);
 
-  function Section(
-    title: string,
-    subtitle: string,
-    action: string,
-    items: Item[],
-    bg: string
-  ) {
-    if (items.length === 0) return null;
+  const nowTotal = sum(now);
+  const soonTotal = sum(soon);
+  const laterTotal = sum(later);
+
+  const max = Math.max(nowTotal, soonTotal, laterTotal, 1);
+
+  function Bar(label: string, value: number, color: string) {
+    const width = Math.round((value / max) * 100);
 
     return (
-      <div className={`rounded-xl p-4 mb-4 ${bg}`}>
-        <p className="font-semibold mb-1">{title}</p>
-        <p className="text-sm text-gray-600 mb-2">{subtitle}</p>
-
-        {items.map((i) => (
-          <div key={i.label} className="flex justify-between py-1">
-            <span>{i.label}</span>
-            <span className="font-medium">£{i.value}</span>
-          </div>
-        ))}
-
-        <p className="text-xs text-gray-500 mt-3">
-          💡 {action}
-        </p>
+      <div className="mb-3">
+        <div className="flex justify-between text-sm mb-1">
+          <span>{label}</span>
+          <span>£{value}</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div
+            className={`${color} h-3 rounded-full`}
+            style={{ width: `${width}%` }}
+          />
+        </div>
       </div>
     );
   }
@@ -94,76 +85,44 @@ export default function ResultsPage() {
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
 
         <h1 className="text-3xl font-bold mb-2">
-          📅 Your savings plan
+          📊 Your savings at a glance
         </h1>
 
-        <p className="text-gray-600 mb-1">
+        <p className="text-gray-600 mb-2">
           You could save up to
         </p>
 
-        <p className="text-4xl font-bold text-blue-600 mb-2">
+        <p className="text-4xl font-bold text-blue-600 mb-4">
           £{total} per month
         </p>
 
         <p className="text-sm text-gray-500 mb-6">
-          Some savings are immediate. Others become available over time as contracts end.
+          This shows how your savings build over time.
         </p>
 
-        {Section(
-          "🟢 Now",
-          "Easy wins you can act on whenever you’re ready",
-          "If you want to start small, fewer takeaways or unused subscriptions are often the easiest changes.",
-          now,
-          "bg-green-50"
-        )}
+        {/* Chart */}
+        <div className="text-left mb-6">
+          <p className="font-semibold mb-3">
+            Savings timeline
+          </p>
 
-        {Section(
-          "🟡 Soon",
-          "Savings that unlock when contracts renew",
-          "When these contracts end, reviewing or switching providers can make a big difference.",
-          soon,
-          "bg-yellow-50"
-        )}
-
-        {Section(
-          "🔵 Later",
-          "Longer-term savings to revisit occasionally",
-          "These don’t need urgent action — a yearly check is usually enough.",
-          later,
-          "bg-blue-50"
-        )}
-
-        {/* Save plan */}
-        <div className="rounded-xl p-4 mb-6 bg-gray-50">
-          {!saved ? (
-            <>
-              <p className="font-semibold mb-2">
-                💾 Save this plan
-              </p>
-              <p className="text-sm text-gray-600 mb-3">
-                You can come back to this anytime. No pressure to act now.
-              </p>
-              <button
-                onClick={savePlan}
-                className="w-full bg-blue-600 text-white py-2 rounded-lg"
-              >
-                Save my plan
-              </button>
-            </>
-          ) : (
-            <p className="text-sm text-green-700">
-              ✔ Plan saved. You can revisit it whenever you’re ready.
-            </p>
-          )}
+          {Bar("🟢 Now", nowTotal, "bg-green-500")}
+          {Bar("🟡 Soon", soonTotal, "bg-yellow-500")}
+          {Bar("🔵 Later", laterTotal, "bg-blue-500")}
         </div>
+
+        {/* Explanation */}
+        <p className="text-sm text-gray-600 mb-6">
+          Some savings are available immediately, while others unlock later when contracts end or circumstances change.
+        </p>
 
         {/* Premium hint */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
-            🔓 Want gentle reminders?
+            🔓 Track this over time
           </p>
           <p className="text-sm text-gray-700 mb-3">
-            Premium helps you remember when savings become available.
+            Premium users can see progress and get reminders when savings unlock.
           </p>
           <button
             onClick={() => alert("Premium coming soon 🙂")}
