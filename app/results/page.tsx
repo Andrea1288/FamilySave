@@ -52,7 +52,6 @@ export default function ResultsPage() {
       ].filter((i) => i.value > 0)
     );
 
-    // Show onboarding guide only once
     const seen = localStorage.getItem("familysave_seen_guide");
     if (!seen) {
       setShowGuide(true);
@@ -62,6 +61,27 @@ export default function ResultsPage() {
   function closeGuide() {
     localStorage.setItem("familysave_seen_guide", "true");
     setShowGuide(false);
+  }
+
+  const all = [...now, ...soon, ...later];
+  const top = all.sort((a, b) => b.value - a.value)[0];
+
+  function firstAction(item?: Item) {
+    if (!item) return null;
+
+    if (item.label.includes("Food")) {
+      return "Start small: plan meals for a few days or cut back on takeaways this week.";
+    }
+    if (item.label.includes("Bills")) {
+      return "Check when your energy or broadband contract ends and set a reminder to review it.";
+    }
+    if (item.label.includes("Transport")) {
+      return "Review insurance renewal dates or compare policies when they’re due.";
+    }
+    if (item.label.includes("Fun")) {
+      return "Check subscriptions and cancel anything you don’t really use.";
+    }
+    return "Keep this in mind and review it when circumstances change.";
   }
 
   function Section(
@@ -91,16 +111,16 @@ export default function ResultsPage() {
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
 
-        {/* Onboarding walkthrough */}
+        {/* Onboarding */}
         {showGuide && (
           <div className="bg-blue-50 rounded-xl p-4 mb-6 text-left">
             <p className="font-semibold mb-2">
               👋 How to read this page
             </p>
             <ul className="text-sm text-gray-700 space-y-1 mb-3">
-              <li>🟢 <strong>Now</strong>: savings you can act on immediately</li>
-              <li>🟡 <strong>Soon</strong>: savings when contracts end or renew</li>
-              <li>🔵 <strong>Later</strong>: longer-term savings to review occasionally</li>
+              <li>🟢 <strong>Now</strong>: things you can change anytime</li>
+              <li>🟡 <strong>Soon</strong>: savings when contracts end</li>
+              <li>🔵 <strong>Later</strong>: longer-term savings</li>
             </ul>
             <button
               onClick={closeGuide}
@@ -124,8 +144,20 @@ export default function ResultsPage() {
         </p>
 
         <p className="text-sm text-gray-500 mb-6">
-          Some savings are immediate. Others become available over time as contracts end.
+          Some savings are immediate. Others happen over time when contracts end.
         </p>
+
+        {/* First action */}
+        {top && (
+          <div className="bg-green-50 rounded-xl p-4 mb-6 text-left">
+            <p className="font-semibold mb-1">
+              ⭐ A good place to start
+            </p>
+            <p className="text-sm text-gray-700">
+              {firstAction(top)}
+            </p>
+          </div>
+        )}
 
         {Section(
           "🟢 Now",
@@ -148,24 +180,9 @@ export default function ResultsPage() {
           "bg-blue-50"
         )}
 
-        <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
-          <p className="font-semibold mb-1">
-            🔓 Want reminders?
-          </p>
-          <p className="text-sm text-gray-700 mb-3">
-            Premium helps you remember when it’s time to act.
-          </p>
-          <button
-            onClick={() => alert("Premium coming soon 🙂")}
-            className="w-full bg-blue-100 text-blue-700 py-2 rounded-lg font-medium"
-          >
-            Try Premium – £4.99/month
-          </button>
-        </div>
-
         <button
           onClick={() => router.push("/family")}
-          className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg"
+          className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg mt-4"
         >
           Start again
         </button>
