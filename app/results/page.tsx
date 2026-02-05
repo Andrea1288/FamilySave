@@ -15,6 +15,7 @@ export default function ResultsPage() {
   const [now, setNow] = useState<Item[]>([]);
   const [soon, setSoon] = useState<Item[]>([]);
   const [later, setLater] = useState<Item[]>([]);
+  const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -32,50 +33,56 @@ export default function ResultsPage() {
 
     setNow(
       [
-        { label: "Food", value: values.food },
-        { label: "Fun", value: values.fun },
+        { label: "🛒 Food", value: values.food },
+        { label: "🎉 Fun", value: values.fun },
       ].filter((i) => i.value > 0)
     );
 
     setSoon(
       [
-        { label: "Bills", value: values.bills },
-        { label: "Transport", value: values.transport },
+        { label: "⚡ Bills", value: values.bills },
+        { label: "🚗 Transport", value: values.transport },
       ].filter((i) => i.value > 0)
     );
 
     setLater(
       [
-        { label: "Home", value: values.home },
-        { label: "Kids", value: values.kids },
+        { label: "🏠 Home", value: values.home },
+        { label: "👶 Kids", value: values.kids },
       ].filter((i) => i.value > 0)
     );
+
+    // Show onboarding guide only once
+    const seen = localStorage.getItem("familysave_seen_guide");
+    if (!seen) {
+      setShowGuide(true);
+    }
   }, []);
 
-  const sum = (items: Item[]) =>
-    items.reduce((acc, i) => acc + i.value, 0);
+  function closeGuide() {
+    localStorage.setItem("familysave_seen_guide", "true");
+    setShowGuide(false);
+  }
 
-  const nowTotal = sum(now);
-  const soonTotal = sum(soon);
-  const laterTotal = sum(later);
-
-  const max = Math.max(nowTotal, soonTotal, laterTotal, 1);
-
-  function Bar(label: string, value: number, color: string) {
-    const width = Math.round((value / max) * 100);
+  function Section(
+    title: string,
+    subtitle: string,
+    items: Item[],
+    bg: string
+  ) {
+    if (items.length === 0) return null;
 
     return (
-      <div className="mb-3">
-        <div className="flex justify-between text-sm mb-1">
-          <span>{label}</span>
-          <span>£{value}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div
-            className={`${color} h-3 rounded-full`}
-            style={{ width: `${width}%` }}
-          />
-        </div>
+      <div className={`rounded-xl p-4 mb-4 ${bg}`}>
+        <p className="font-semibold mb-1">{title}</p>
+        <p className="text-sm text-gray-600 mb-2">{subtitle}</p>
+
+        {items.map((i) => (
+          <div key={i.label} className="flex justify-between py-1">
+            <span>{i.label}</span>
+            <span className="font-medium">£{i.value}</span>
+          </div>
+        ))}
       </div>
     );
   }
@@ -84,8 +91,28 @@ export default function ResultsPage() {
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
 
+        {/* Onboarding walkthrough */}
+        {showGuide && (
+          <div className="bg-blue-50 rounded-xl p-4 mb-6 text-left">
+            <p className="font-semibold mb-2">
+              👋 How to read this page
+            </p>
+            <ul className="text-sm text-gray-700 space-y-1 mb-3">
+              <li>🟢 <strong>Now</strong>: savings you can act on immediately</li>
+              <li>🟡 <strong>Soon</strong>: savings when contracts end or renew</li>
+              <li>🔵 <strong>Later</strong>: longer-term savings to review occasionally</li>
+            </ul>
+            <button
+              onClick={closeGuide}
+              className="w-full bg-blue-600 text-white py-2 rounded-lg"
+            >
+              Got it
+            </button>
+          </div>
+        )}
+
         <h1 className="text-3xl font-bold mb-2">
-          📊 Your savings at a glance
+          📅 Your savings plan
         </h1>
 
         <p className="text-gray-600 mb-2">
@@ -97,32 +124,36 @@ export default function ResultsPage() {
         </p>
 
         <p className="text-sm text-gray-500 mb-6">
-          This shows how your savings build over time.
+          Some savings are immediate. Others become available over time as contracts end.
         </p>
 
-        {/* Chart */}
-        <div className="text-left mb-6">
-          <p className="font-semibold mb-3">
-            Savings timeline
-          </p>
+        {Section(
+          "🟢 Now",
+          "Savings you can act on immediately",
+          now,
+          "bg-green-50"
+        )}
 
-          {Bar("🟢 Now", nowTotal, "bg-green-500")}
-          {Bar("🟡 Soon", soonTotal, "bg-yellow-500")}
-          {Bar("🔵 Later", laterTotal, "bg-blue-500")}
-        </div>
+        {Section(
+          "🟡 Soon",
+          "Savings when contracts end or renew",
+          soon,
+          "bg-yellow-50"
+        )}
 
-        {/* Explanation */}
-        <p className="text-sm text-gray-600 mb-6">
-          Some savings are available immediately, while others unlock later when contracts end or circumstances change.
-        </p>
+        {Section(
+          "🔵 Later",
+          "Longer-term or harder-to-change savings",
+          later,
+          "bg-blue-50"
+        )}
 
-        {/* Premium hint */}
         <div className="border border-dashed border-blue-300 rounded-xl p-4 mb-6 text-left">
           <p className="font-semibold mb-1">
-            🔓 Track this over time
+            🔓 Want reminders?
           </p>
           <p className="text-sm text-gray-700 mb-3">
-            Premium users can see progress and get reminders when savings unlock.
+            Premium helps you remember when it’s time to act.
           </p>
           <button
             onClick={() => alert("Premium coming soon 🙂")}
