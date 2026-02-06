@@ -15,7 +15,6 @@ export default function ResultsPage() {
   const [now, setNow] = useState<Item[]>([]);
   const [soon, setSoon] = useState<Item[]>([]);
   const [later, setLater] = useState<Item[]>([]);
-  const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -51,56 +50,34 @@ export default function ResultsPage() {
         { label: "👶 Kids", value: values.kids },
       ].filter((i) => i.value > 0)
     );
-
-    const seen = localStorage.getItem("familysave_seen_guide");
-    if (!seen) {
-      setShowGuide(true);
-    }
   }, []);
-
-  function closeGuide() {
-    localStorage.setItem("familysave_seen_guide", "true");
-    setShowGuide(false);
-  }
-
-  const all = [...now, ...soon, ...later];
-  const top = all.sort((a, b) => b.value - a.value)[0];
-
-  function firstAction(item?: Item) {
-    if (!item) return null;
-
-    if (item.label.includes("Food")) {
-      return "Start small: plan meals for a few days or cut back on takeaways this week.";
-    }
-    if (item.label.includes("Bills")) {
-      return "Check when your energy or broadband contract ends and set a reminder to review it.";
-    }
-    if (item.label.includes("Transport")) {
-      return "Review insurance renewal dates or compare policies when they’re due.";
-    }
-    if (item.label.includes("Fun")) {
-      return "Check subscriptions and cancel anything you don’t really use.";
-    }
-    return "Keep this in mind and review it when circumstances change.";
-  }
 
   function Section(
     title: string,
     subtitle: string,
     items: Item[],
-    bg: string
+    dot: string
   ) {
     if (items.length === 0) return null;
 
     return (
-      <div className={`rounded-xl p-4 mb-4 ${bg}`}>
-        <p className="font-semibold mb-1">{title}</p>
-        <p className="text-sm text-gray-600 mb-2">{subtitle}</p>
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-2">
+          <span className={`w-3 h-3 rounded-full ${dot}`} />
+          <h2 className="text-xl font-semibold">{title}</h2>
+        </div>
+
+        <p className="text-gray-400 text-sm mb-4">
+          {subtitle}
+        </p>
 
         {items.map((i) => (
-          <div key={i.label} className="flex justify-between py-1">
+          <div
+            key={i.label}
+            className="flex justify-between py-2 border-b border-gray-700"
+          >
             <span>{i.label}</span>
-            <span className="font-medium">£{i.value}</span>
+            <span>£{i.value}</span>
           </div>
         ))}
       </div>
@@ -108,85 +85,50 @@ export default function ResultsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
+    <main className="min-h-screen bg-black text-white px-6 py-10">
+      <h1 className="text-4xl font-bold mb-6 flex items-center gap-3">
+        📅 Your savings plan
+      </h1>
 
-        {/* Onboarding */}
-        {showGuide && (
-          <div className="bg-blue-50 rounded-xl p-4 mb-6 text-left">
-            <p className="font-semibold mb-2">
-              👋 How to read this page
-            </p>
-            <ul className="text-sm text-gray-700 space-y-1 mb-3">
-              <li>🟢 <strong>Now</strong>: things you can change anytime</li>
-              <li>🟡 <strong>Soon</strong>: savings when contracts end</li>
-              <li>🔵 <strong>Later</strong>: longer-term savings</li>
-            </ul>
-            <button
-              onClick={closeGuide}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg"
-            >
-              Got it
-            </button>
-          </div>
-        )}
+      <p className="text-gray-400 mb-2">
+        You could save up to
+      </p>
 
-        <h1 className="text-3xl font-bold mb-2">
-          📅 Your savings plan
-        </h1>
+      <p className="text-5xl font-bold mb-6">
+        £{total} <span className="text-xl font-normal">per month</span>
+      </p>
 
-        <p className="text-gray-600 mb-2">
-          You could save up to
-        </p>
+      <p className="text-gray-400 mb-12">
+        Some savings are immediate. Others become available over time as contracts end.
+      </p>
 
-        <p className="text-4xl font-bold text-blue-600 mb-4">
-          £{total} per month
-        </p>
+      {Section(
+        "Now",
+        "Savings you can act on immediately",
+        now,
+        "bg-green-500"
+      )}
 
-        <p className="text-sm text-gray-500 mb-6">
-          Some savings are immediate. Others happen over time when contracts end.
-        </p>
+      {Section(
+        "Soon",
+        "Savings when contracts end or renew",
+        soon,
+        "bg-yellow-400"
+      )}
 
-        {/* First action */}
-        {top && (
-          <div className="bg-green-50 rounded-xl p-4 mb-6 text-left">
-            <p className="font-semibold mb-1">
-              ⭐ A good place to start
-            </p>
-            <p className="text-sm text-gray-700">
-              {firstAction(top)}
-            </p>
-          </div>
-        )}
+      {Section(
+        "Later",
+        "Longer-term or harder-to-change savings",
+        later,
+        "bg-blue-500"
+      )}
 
-        {Section(
-          "🟢 Now",
-          "Savings you can act on immediately",
-          now,
-          "bg-green-50"
-        )}
-
-        {Section(
-          "🟡 Soon",
-          "Savings when contracts end or renew",
-          soon,
-          "bg-yellow-50"
-        )}
-
-        {Section(
-          "🔵 Later",
-          "Longer-term or harder-to-change savings",
-          later,
-          "bg-blue-50"
-        )}
-
-        <button
-          onClick={() => router.push("/family")}
-          className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg mt-4"
-        >
-          Start again
-        </button>
-      </div>
+      <button
+        onClick={() => router.push("/family")}
+        className="w-full mt-10 bg-white text-black py-4 rounded-xl text-lg font-semibold"
+      >
+        Start again
+      </button>
     </main>
   );
 }
