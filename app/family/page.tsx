@@ -20,10 +20,8 @@ export default function FamilyPage() {
 
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(1);
-  const [contracts, setContracts] =
-    useState<Contracts>(EMPTY_CONTRACTS);
+  const [contracts, setContracts] = useState<Contracts>(EMPTY_CONTRACTS);
 
-  /* Load saved contracts */
   useEffect(() => {
     const saved = localStorage.getItem("familysave_contracts");
     if (saved) {
@@ -31,7 +29,6 @@ export default function FamilyPage() {
     }
   }, []);
 
-  /* Save contracts */
   useEffect(() => {
     localStorage.setItem(
       "familysave_contracts",
@@ -39,19 +36,16 @@ export default function FamilyPage() {
     );
   }, [contracts]);
 
-  function MonthSelect(
-    label: string,
-    key: keyof Contracts
-  ) {
+  function MonthSelect(label: string, key: keyof Contracts) {
     return (
-      <div className="flex justify-between items-center gap-4">
+      <div className="flex justify-between items-center">
         <span>{label}</span>
         <select
           value={contracts[key]}
           onChange={(e) =>
             setContracts({ ...contracts, [key]: e.target.value })
           }
-          className="border px-2 py-1 rounded"
+          className="bg-gray-800 border border-gray-600 rounded px-3 py-1 text-white"
         >
           <option value="">Not sure</option>
           {[
@@ -68,55 +62,77 @@ export default function FamilyPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-        <h1 className="text-3xl font-bold mb-4">
-          Your household 👨‍👩‍👧‍👦
-        </h1>
+    <main className="min-h-screen bg-black text-white px-6 py-10">
+      <h1 className="text-4xl font-bold mb-8">
+        👨‍👩‍👧‍👦 Your household
+      </h1>
 
-        {/* Family size */}
+      {/* Family size */}
+      <div className="mb-10">
+        <p className="text-gray-400 mb-4">Family size</p>
+
         <div className="flex justify-between mb-4">
           <span>Adults</span>
-          <div className="flex gap-2">
-            <button onClick={() => setAdults(Math.max(1, adults - 1))}>−</button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setAdults(Math.max(1, adults - 1))}
+              className="px-3 py-1 bg-gray-700 rounded"
+            >
+              −
+            </button>
             <span>{adults}</span>
-            <button onClick={() => setAdults(adults + 1)}>+</button>
+            <button
+              onClick={() => setAdults(adults + 1)}
+              className="px-3 py-1 bg-gray-700 rounded"
+            >
+              +
+            </button>
           </div>
         </div>
 
-        <div className="flex justify-between mb-6">
+        <div className="flex justify-between">
           <span>Children</span>
-          <div className="flex gap-2">
-            <button onClick={() => setChildren(Math.max(0, children - 1))}>−</button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setChildren(Math.max(0, children - 1))}
+              className="px-3 py-1 bg-gray-700 rounded"
+            >
+              −
+            </button>
             <span>{children}</span>
-            <button onClick={() => setChildren(children + 1)}>+</button>
+            <button
+              onClick={() => setChildren(children + 1)}
+              className="px-3 py-1 bg-gray-700 rounded"
+            >
+              +
+            </button>
           </div>
         </div>
-
-        {/* Contracts */}
-        <div className="text-left mb-6">
-          <p className="font-semibold mb-3">
-            When do your contracts end?
-          </p>
-
-          <div className="space-y-3">
-            {MonthSelect("⚡ Energy", "energy")}
-            {MonthSelect("🌐 Internet", "internet")}
-            {MonthSelect("📱 Mobile", "mobile")}
-          </div>
-
-          <p className="text-xs text-gray-500 mt-2">
-            This helps us show when savings become available.
-          </p>
-        </div>
-
-        <button
-          onClick={() => router.push("/spending")}
-          className="w-full bg-blue-600 text-white py-3 rounded-xl text-lg"
-        >
-          Continue
-        </button>
       </div>
+
+      {/* Contracts */}
+      <div className="mb-12">
+        <p className="text-gray-400 mb-4">
+          When do your contracts end?
+        </p>
+
+        <div className="space-y-4">
+          {MonthSelect("⚡ Energy", "energy")}
+          {MonthSelect("🌐 Internet", "internet")}
+          {MonthSelect("📱 Mobile", "mobile")}
+        </div>
+
+        <p className="text-sm text-gray-500 mt-4">
+          This helps us show when savings become available.
+        </p>
+      </div>
+
+      <button
+        onClick={() => router.push("/spending")}
+        className="w-full bg-white text-black py-4 rounded-xl text-lg font-semibold"
+      >
+        Continue
+      </button>
     </main>
   );
 }
